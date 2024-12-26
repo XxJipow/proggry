@@ -1,0 +1,1456 @@
+<html><head><link rel="icon" href="pfpr.png" type="image/x-icon"><title>Proggry</title>
+  <style>
+  body {
+      background-color: #0000AA;
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      user-select: none;
+      background-image: linear-gradient(45deg, #0000AA 0%, #800080 100%);
+  }
+  
+  .window {
+      position: absolute;  
+      min-width: 300px;
+      max-width: 90vw;
+      max-height: 90vh;
+      background: #c0c0c0;
+      border: 2px solid #fff;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+      resize: both;
+      overflow: auto;
+      cursor: default;
+      transition: transform 0.1s ease-out;
+  }
+  
+  .window.locked {
+    cursor: not-allowed;
+  }
+  
+  .title-bar {
+      background: #000080;
+      color: white;
+      padding: 2px 4px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
+  }
+  
+  .title {
+      font-size: 12px;
+      font-weight: bold;
+      text-shadow: 2px 2px #000;
+  }
+  
+  .buttons {
+      display: flex;
+      gap: 4px;
+  }
+  
+  .button {
+      width: 16px;
+      height: 16px;
+      background: #c0c0c0;
+      border: 1px solid #fff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+  }
+  
+  .button:active {
+      border: 1px solid #000;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+  }
+  
+  .content {
+      padding: 10px;
+      min-height: 50px;
+      max-height: calc(90vh - 80px);
+      overflow: auto;
+  }
+  
+  .hidden {
+      display: none;
+  }
+  
+  .input-area {
+      width: 100%;
+      margin-top: 10px;
+  }
+  
+  textarea {
+      width: 100%;
+      height: 100px;
+      background: #000;
+      color: #00ff00;
+      border: 2px inset #fff;
+      font-family: 'Courier New', monospace;
+      resize: none;
+      margin-bottom: 10px;
+  }
+  
+  .create-button {
+      background: #c0c0c0;
+      border: 2px solid #fff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+  }
+  
+  .create-button:active {
+      border: 2px solid #000;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+  }
+  
+  .program-output {
+      border: 2px inset #fff;
+      padding: 10px;
+      background: #fff;
+      margin-top: 10px;
+      width: auto;
+      height: auto;
+      min-height: 50px;
+  }
+  
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+  
+  .loading {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #c0c0c0;
+      border-top: 4px solid #000080;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+  }
+  
+  .loading-container {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+  }
+  
+  .toolbar {
+      background: #c0c0c0;
+      padding: 5px;
+      border-bottom: 2px solid #808080;
+      display: flex;
+      gap: 10px;
+  }
+  
+  .toolbar-button {
+      background: #c0c0c0;
+      border: 2px solid #fff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      padding: 2px 5px;
+      font-size: 11px;
+      cursor: pointer;
+  }
+  
+  .toolbar-button:active {
+      border: 2px solid #000;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+  }
+  
+  .status-bar {
+      background: #c0c0c0;
+      border-top: 2px solid #808080;
+      padding: 2px 5px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+  }
+  
+  .examples-dropdown {
+      width: 100%;
+      margin-bottom: 10px;
+      background: #c0c0c0;
+      border: 2px inset #fff;
+      padding: 2px;
+      font-family: 'Courier New', monospace;
+  }
+  
+  .ai-settings {
+      background: #f0f0f0;
+      border: 2px inset #fff;
+      padding: 10px;
+      margin: 10px 0;
+  }
+  
+  .ai-settings.hidden {
+      display: none;
+  }
+  
+  .setting-group {
+      margin: 15px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #f0f0f0;
+  }
+  
+  .setting-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+  }
+  
+  .setting-group select {
+      width: 100%;
+      padding: 5px;
+      background: #fff;
+      border: 2px inset #fff;
+  }
+  
+  .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 5px;
+  }
+  
+  .checkbox-group label {
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+  }
+  
+  .prompt-library {
+      background: #fff;
+      border: 2px inset #fff;
+      padding: 10px;
+      margin: 10px 0;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+  }
+  
+  .prompt-item {
+      padding: 5px;
+      cursor: pointer;
+      border-bottom: 1px solid #ccc;
+      transition: background-color 0.2s;
+  }
+  
+  .prompt-item:hover {
+      background: #f0f0f0;
+  }
+  
+  .prompt-item:active {
+      background: #e0e0e0;
+  }
+  
+  .ai-edit-prompt {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #c0c0c0;
+      border: 2px solid #fff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      padding: 20px;
+      z-index: 1000;
+      width: 80%;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  }
+  
+  .ai-edit-prompt textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+      background: #000;
+      color: #00ff00;
+      border: 2px inset #fff;
+      font-family: 'Courier New', monospace;
+      resize: none;
+  }
+  
+  .ai-edit-prompt .create-button {
+      margin-right: 10px;
+  }
+  
+  /* Add styles for user library */
+  .user-library {
+      background: #fff;
+      border: 2px inset #fff;
+      padding: 10px;
+      margin: 10px 0;
+      max-height: 400px;
+      overflow-y: auto;
+      font-size: 12px;
+  }
+  
+  .program-item {
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      padding: 10px;
+  }
+  
+  .program-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+  }
+  
+  .program-title {
+      font-weight: bold;
+  }
+  
+  .program-author {
+      color: #666;
+  }
+  
+  .program-actions {
+      display: flex;
+      gap: 5px;
+  }
+  
+  .program-actions button {
+      background: #c0c0c0;
+      border: 1px solid #fff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      padding: 2px 5px;
+      cursor: pointer;
+  }
+  
+  .delete-btn {
+      background: #ff6b6b !important;
+      color: white;
+  }
+  
+  /* Add these styles to the existing CSS */
+  #userLibraryWindow {
+      min-width: 400px;
+      max-width: 600px;
+  }
+  
+  #userLibraryWindow .content {
+      padding: 15px;
+  }
+  
+  #userLibraryWindow h3 {
+      margin: 0 0 15px 0;
+      font-family: 'Courier New', monospace;
+  }
+  
+  /* Add styles for program prompt display */
+  .program-prompt {
+      margin-top: 10px;
+      font-style: italic;
+      color: #666;
+      padding: 5px;
+      background: #f8f8f8;
+      border-radius: 3px;
+  }
+  
+  .program-settings {
+      margin-top: 10px;
+      font-size: 12px;
+  }
+  
+  .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #c0c0c0;
+      border: 1px solid #fff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      z-index: 1000;
+      cursor: se-resize;
+  }
+  
+  .resize-handle.top-left,
+  .resize-handle.top-right,
+  .resize-handle.bottom-left {
+      display: none;
+  }
+  
+  .resize-handle.bottom-right {
+      bottom: -5px;
+      right: -5px;
+  }
+  
+  .search-bar {
+      margin: 10px 0;
+      width: 100%;
+      display: flex;
+      gap: 5px;
+  }
+  
+  .search-bar input {
+      flex: 1;
+      padding: 5px;
+      border: 2px inset #fff;
+      font-family: 'Courier New', monospace;
+  }
+  
+  .window-controls {
+      display: flex;
+      gap: 5px;
+      margin: 5px 0;
+  }
+  
+  .snap-guide {
+      position: fixed;
+      background: rgba(0,128,255,0.3);
+      pointer-events: none;
+      z-index: 9999;
+  }
+  
+  /* Add styles for desktop icons and folders */
+  .desktop-icon {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .icon-image {
+    width: 32px;
+    height: 32px;
+    background: #c0c0c0;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  
+  .icon-label {
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    text-shadow: 1px 1px #000;
+  }
+  
+  .folder {
+    background: #c3c7cb;
+  }
+  
+  .error {
+    color: red;
+    padding: 10px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    border: 1px solid red;
+    margin: 10px;
+  }
+  
+  .error-window {
+      min-width: 300px;
+      min-height: 200px;
+  }
+  </style>
+  </head>
+  <body>
+  
+  <div class="window" id="programWindow" style="transform: translate(50px, 50px);">
+      <div class="title-bar" id="titleBar">
+          <div class="title">prog_gen3k.exe</div>
+          <div class="buttons">
+              <div class="button" onclick="hideContent()">_</div>
+              <div class="button">&#x25a1;</div>
+              <div class="button" onclick="destroyProgram()">&#xd7;</div>
+          </div>
+      </div>
+      <div class="toolbar">
+          <button class="toolbar-button" onclick="clearPrompt()">New</button>
+          <button class="toolbar-button" onclick="savePrompt()">Save</button>
+          <button class="toolbar-button" onclick="loadPrompt()">Load</button>
+          <button class="toolbar-button" onclick="toggleHelp()">Help</button>
+          <button class="toolbar-button" onclick="toggleAISettings()">AI Settings</button>
+          <button class="toolbar-button" onclick="toggleUserLibrary()">AI Generated Library</button>
+      </div>
+      <div class="content" id="content">
+          <p>Program Generator 3000 - v2.0</p>
+          <select class="examples-dropdown" id="exampleSelect" onchange="loadExample()">
+              <option value>-- Select Example Template --</option>
+              <option value="game">Simple Game Template</option>
+              <option value="calculator">Calculator Template</option>
+              <option value="animation">Animation Template</option>
+          </select>
+          <div class="input-area">
+              <textarea id="programPrompt" placeholder="Enter your program requirements..."></textarea>
+              <button class="create-button" onclick="generateProgram()">CREATE ME THE PROGRAM</button>
+          </div>
+          <div class="ai-settings hidden" id="aiSettings">
+              <h4>AI Generation Settings</h4>
+              <div class="setting-group">
+                  <label>Creativity Level:</label>
+                  <input type="range" id="creativityLevel" min="0" max="100" value="70">
+              </div>
+              <div class="setting-group">
+                  <label>Code Complexity:</label>
+                  <select id="complexityLevel">
+                      <option value="basic">Basic</option>
+                      <option value="intermediate" selected>Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Framework Preferences:</label>
+                  <div class="checkbox-group">
+                      <label><input type="checkbox" id="useReact"> React</label>
+                      <label><input type="checkbox" id="useVue"> Vue</label>
+                      <label><input type="checkbox" id="useThree"> Three.js</label>
+                  </div>
+              </div>
+              <div class="setting-group">
+                  <label>Code Documentation Level:</label>
+                  <select id="documentationLevel">
+                      <option value="minimal">Minimal</option>
+                      <option value="standard" selected>Standard</option>
+                      <option value="detailed">Detailed</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Performance Optimization:</label>
+                  <select id="performanceLevel">
+                      <option value="basic">Basic</option>
+                      <option value="optimized" selected>Optimized</option>
+                      <option value="maximum">Maximum</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Design Pattern Usage:</label>
+                  <select id="designPatterns">
+                      <option value="simple">Simple</option>
+                      <option value="moderate" selected>Moderate</option>
+                      <option value="advanced">Advanced</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Error Handling:</label>
+                  <select id="errorHandling">
+                      <option value="basic">Basic</option>
+                      <option value="comprehensive" selected>Comprehensive</option>
+                      <option value="bulletproof">Bulletproof</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Code Architecture:</label>
+                  <select id="codeArchitecture">
+                      <option value="monolithic">Monolithic</option>
+                      <option value="modular" selected>Modular</option>
+                      <option value="microservices">Microservices</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>UI/UX Focus:</label>
+                  <div class="checkbox-group">
+                      <label><input type="checkbox" id="responsiveDesign" checked> Responsive Design</label>
+                      <label><input type="checkbox" id="accessibility" checked> Accessibility</label>
+                      <label><input type="checkbox" id="animations"> Rich Animations</label>
+                  </div>
+              </div>
+              <div class="setting-group">
+                  <label>Testing Level:</label>
+                  <select id="testingLevel">
+                      <option value="basic">Basic</option>
+                      <option value="standard" selected>Standard</option>
+                      <option value="comprehensive">Comprehensive</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Code Style:</label>
+                  <select id="codeStyle">
+                      <option value="functional">Functional</option>
+                      <option value="oop" selected>Object-Oriented</option>
+                      <option value="hybrid">Hybrid</option>
+                  </select>
+              </div>
+              <div class="setting-group">
+                  <label>Security Features:</label>
+                  <div class="checkbox-group">
+                      <label><input type="checkbox" id="inputValidation" checked> Input Validation</label>
+                      <label><input type="checkbox" id="xssProtection" checked> XSS Protection</label>
+                      <label><input type="checkbox" id="sanitization" checked> Data Sanitization</label>
+                  </div>
+              </div>
+              <div class="setting-group">
+                  <label>Browser Compatibility:</label>
+                  <select id="browserSupport">
+                      <option value="modern">Modern Browsers Only</option>
+                      <option value="standard" selected>Standard Support</option>
+                      <option value="legacy">Legacy Support</option>
+                  </select>
+              </div>
+          </div>
+      </div>
+      <div class="status-bar">
+          <span id="statusText">Ready</span>
+          <span id="programCount">Programs: 0</span>
+      </div>
+      <div class="resize-handle bottom-right"></div>
+  </div>
+  
+  <script>const examples = {
+    game: "Create a simple click-based game with score tracking",
+    calculator: "Create a calculator with basic arithmetic operations",
+    animation: "Create an animated scene with interactive elements"
+  };
+  let windowCount = 0;
+  let aiLibraryPrograms = [];
+  let desktopIcons = [];
+  let folders = [];
+  let iconCounter = 0;
+  let isDragging = false;
+  let currentX;
+  let initialX;
+  let initialY;
+  let xOffset = 50;
+  let yOffset = 50;
+  async function generateAIPrograms() {
+    try {
+      const response = await fetch('/api/ai_completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: `Generate 5 creative and sophisticated program ideas with specific AI settings. Each should be unique, technically interesting and demonstrate advanced capabilities.
+  
+                  Requirements:
+                  - Ideas should showcase different programming concepts and techniques
+                  - Include complex interactions and engaging user experiences
+                  - Mix of game mechanics, data visualization, AI features, and creative tools
+                  - Settings should match the complexity of the idea
+                  - Programs should demonstrate technical sophistication
+                  
+                  Response Format:
+                  {
+                      "programs": [
+                          {
+                              "id": "string",
+                              "title": "string",
+                              "prompt": "string",
+                              "author": "AI Assistant",
+                              "aiSettings": {
+                                  "creativity": number,
+                                  "complexity": "basic" | "intermediate" | "advanced",
+                                  "frameworks": {
+                                      "react": boolean,
+                                      "vue": boolean,
+                                      "three": boolean
+                                  }
+                              }
+                          }
+                      ]
+                  }
+                  
+                  Example Response:
+                  {
+                      "programs": [
+                          {
+                              "id": "p1",
+                              "title": "Neural Network Visualizer",
+                              "prompt": "Create an interactive neural network visualization where users can design and train simple networks. Show network architecture with nodes and weighted connections. Animate data flow during training. Include controls for learning rate, network structure, and training data.",
+                              "author": "AI Assistant",
+                              "aiSettings": {
+                                  "creativity": 90,
+                                  "complexity": "advanced",
+                                  "frameworks": {
+                                      "react": true,
+                                      "vue": false,
+                                      "three": true
+                                  }
+                              }
+                          }
+                      ]
+                  }`,
+          data: null
+        })
+      });
+      const data = await response.json();
+      aiLibraryPrograms = data.programs;
+      return data.programs;
+    } catch (error) {
+      console.error('Error generating AI programs:', error);
+      return [];
+    }
+  }
+  function getAISettings() {
+    return {
+      creativity: document.getElementById('creativityLevel')?.value || 70,
+      complexity: document.getElementById('complexityLevel')?.value || 'intermediate',
+      frameworks: {
+        react: document.getElementById('useReact')?.checked || false,
+        vue: document.getElementById('useVue')?.checked || false,
+        three: document.getElementById('useThree')?.checked || false
+      },
+      documentation: document.getElementById('documentationLevel')?.value || 'standard',
+      performance: document.getElementById('performanceLevel')?.value || 'optimized',
+      designPatterns: document.getElementById('designPatterns')?.value || 'moderate',
+      errorHandling: document.getElementById('errorHandling')?.value || 'comprehensive',
+      architecture: document.getElementById('codeArchitecture')?.value || 'modular',
+      uiFeatures: {
+        responsive: document.getElementById('responsiveDesign')?.checked || true,
+        accessibility: document.getElementById('accessibility')?.checked || true,
+        animations: document.getElementById('animations')?.checked || false
+      },
+      testing: document.getElementById('testingLevel')?.value || 'standard',
+      codeStyle: document.getElementById('codeStyle')?.value || 'oop',
+      security: {
+        inputValidation: document.getElementById('inputValidation')?.checked || true,
+        xssProtection: document.getElementById('xssProtection')?.checked || true,
+        sanitization: document.getElementById('sanitization')?.checked || true
+      },
+      browserSupport: document.getElementById('browserSupport')?.value || 'standard'
+    };
+  }
+  function loadExample() {
+    const select = document.getElementById("exampleSelect");
+    const prompt = document.getElementById("programPrompt");
+    prompt.value = examples[select.value] || "";
+  }
+  function clearPrompt() {
+    document.getElementById("programPrompt").value = "";
+    document.getElementById("statusText").textContent = "New prompt created";
+  }
+  function savePrompt() {
+    const prompt = document.getElementById("programPrompt").value;
+    localStorage.setItem("savedPrompt", prompt);
+    document.getElementById("statusText").textContent = "Prompt saved";
+  }
+  function loadPrompt() {
+    const savedPrompt = localStorage.getItem("savedPrompt");
+    if (savedPrompt) {
+      document.getElementById("programPrompt").value = savedPrompt;
+      document.getElementById("statusText").textContent = "Prompt loaded";
+    }
+  }
+  function toggleHelp() {
+    alert("Program Generator 3000 - Help\n\n" + "1. Type your program requirements in the text area\n" + "2. Use example templates for inspiration\n" + "3. Adjust AI Settings to customize generation:\n" + "   - Creativity Level: Controls AI's creative freedom\n" + "   - Code Complexity: Sets the sophistication level\n" + "   - Framework Preferences: Choose preferred libraries\n" + "4. Click 'CREATE ME THE PROGRAM' to generate\n" + "5. Save/Load your prompts for later use\n" + "6. Drag windows by their title bars\n");
+  }
+  function toggleAISettings() {
+    const settings = document.getElementById('aiSettings');
+    settings.classList.toggle('hidden');
+    document.getElementById("statusText").textContent = "AI settings " + (settings.classList.contains('hidden') ? "hidden" : "shown");
+  }
+  function toggleUserLibrary() {
+    const existingLibrary = document.getElementById('userLibraryWindow');
+    if (existingLibrary) {
+      existingLibrary.classList.toggle('hidden');
+      return;
+    }
+    const libraryWindow = document.createElement('div');
+    libraryWindow.id = 'userLibraryWindow';
+    libraryWindow.className = 'window';
+    libraryWindow.style.transform = `translate(${150 + windowCount * 30}px, ${150 + windowCount * 30}px)`;
+    libraryWindow.innerHTML = `
+          <div class="title-bar">
+              <div class="title">ai_generated_library.exe</div>
+              <div class="buttons">
+                  <div class="button" onclick="this.closest('.window').querySelector('.content').classList.toggle('hidden')">_</div>
+                  <div class="button">□</div>
+                  <div class="button" onclick="this.closest('.window').remove()">×</div>
+              </div>
+          </div>
+          <div class="toolbar">
+              <button class="toolbar-button" onclick="this.closest('.window').querySelector('.content').requestFullscreen()">Fullscreen</button>
+              <button class="toolbar-button" onclick="refreshAILibrary()">Refresh Library</button>
+          </div>
+          <div class="content">
+              <h3>AI Generated Program Library</h3>
+              <div id="userLibrary" class="user-library">
+                  <div class="loading-container"><div class="loading"></div></div>
+              </div>
+              <div class="search-bar">
+                  <input type="text" placeholder="Search programs...">
+                  <button class="toolbar-button">Search</button>
+              </div>
+          </div>
+          <div class="status-bar">
+              <span>AI Generated Library Active</span>
+          </div>
+      `;
+    libraryWindow.querySelector('.title-bar').addEventListener('mousedown', dragStart);
+    document.body.appendChild(libraryWindow);
+    initResizeHandles(libraryWindow);
+    initWindowSnapping(libraryWindow);
+    addProgramSearch(libraryWindow);
+    refreshAILibrary();
+  }
+  async function refreshAILibrary() {
+    if (!confirm('Warning: Refreshing will generate 5 new AI-generated programs. Continue?')) {
+      return;
+    }
+    const library = document.getElementById('userLibrary');
+    if (!library) return;
+    library.innerHTML = '<div class="loading-container"><div class="loading"></div></div>';
+    const programs = await generateAIPrograms();
+    library.innerHTML = '';
+    programs.forEach(program => {
+      const programItem = document.createElement('div');
+      programItem.className = 'program-item';
+      programItem.innerHTML = `
+              <div class="program-header">
+                  <span class="program-title">${program.title}</span>
+                  <span class="program-author">by ${program.author}</span>
+              </div>
+              <div class="program-actions">
+                  <button onclick='createFromAIPrompt(${JSON.stringify({
+        prompt: program.prompt,
+        aiSettings: program.aiSettings
+      })})'>Generate Program</button>
+              </div>
+              <div class="program-prompt">
+                  <small>${program.prompt}</small>
+              </div>
+              <div class="program-settings">
+                  <small>
+                      AI Settings:<br>
+                      Creativity: ${program.aiSettings.creativity}%<br>
+                      Complexity: ${program.aiSettings.complexity}<br>
+                      Frameworks: ${Object.entries(program.aiSettings.frameworks).filter(([, enabled]) => enabled).map(([name]) => name).join(', ') || 'None'}
+                  </small>
+              </div>
+          `;
+      library.appendChild(programItem);
+    });
+  }
+  function createFromAIPrompt(data) {
+    document.getElementById('programPrompt').value = data.prompt;
+    if (data.aiSettings) {
+      document.getElementById('creativityLevel').value = data.aiSettings.creativity;
+      document.getElementById('complexityLevel').value = data.aiSettings.complexity;
+      document.getElementById('useReact').checked = data.aiSettings.frameworks.react;
+      document.getElementById('useVue').checked = data.aiSettings.frameworks.vue;
+      document.getElementById('useThree').checked = data.aiSettings.frameworks.three;
+    }
+    generateProgram();
+  }
+  async function generateProgram() {
+    const programPromptElement = document.getElementById('programPrompt');
+    const statusTextElement = document.getElementById('statusText');
+    const programCountElement = document.getElementById('programCount');
+    if (!programPromptElement || !statusTextElement || !programCountElement) {
+      console.error('Required elements not found');
+      return;
+    }
+    const prompt = programPromptElement.value;
+    if (!prompt) return;
+    const aiSettings = getAISettings();
+    const aiPrompt = `Create a complete, interactive web application based on this prompt: ${prompt}
+    
+    Requirements:
+    - Generate COMPLETE, WORKING code that creates a fully functional interactive experience
+    - Include all necessary HTML, CSS, and JavaScript 
+    - Response must be valid HTML that starts with <html> and ends with </html>
+    - Ensure all JavaScript is properly enclosed in <script> tags
+    - Implement proper error handling and validation
+    - Use modern ES6+ JavaScript features and best practices
+    - Add comments explaining complex logic
+    - Include responsive design with media queries
+    - Optimize performance and avoid memory leaks
+    - Follow accessibility guidelines with ARIA labels
+    - Include interactive elements and smooth animations
+    - Add proper event handling and cleanup
+    - Use semantic HTML elements
+    - Consider the following settings:
+      * Creativity Level: ${aiSettings.creativity} (higher means more experimental features)
+      * Complexity: ${aiSettings.complexity} (determines architectural sophistication)
+      * Frameworks: ${Object.entries(aiSettings.frameworks).filter(([, enabled]) => enabled).map(([name]) => name).join(', ')}
+      * Code Documentation Level: ${aiSettings.documentation}
+      * Performance Optimization: ${aiSettings.performance}
+      * Design Pattern Usage: ${aiSettings.designPatterns}
+      * Error Handling: ${aiSettings.errorHandling}
+      * Code Architecture: ${aiSettings.architecture}
+      * UI Features: ${JSON.stringify(aiSettings.uiFeatures)}
+      * Testing Level: ${aiSettings.testing}
+      * Code Style: ${aiSettings.codeStyle}
+      * Security Features: ${JSON.stringify(aiSettings.security)}
+      * Browser Compatibility: ${aiSettings.browserSupport}
+    
+    Complexity Guidelines:
+    - Basic: Single page with core functionality
+    - Intermediate: Multiple components with state management
+    - Advanced: Full application architecture, optimizations, advanced features
+    
+    Focus on creating a polished, professional experience with:
+    - Clean, maintainable code structure
+    - Smooth user interactions and feedback
+    - Proper error states and loading indicators
+    - Consistent styling and visual hierarchy
+    - Performance optimization
+    - Cross-browser compatibility
+    
+    Response Format:
+    {
+        "title": "Name of the Generated Program",
+        "code": "<html>...complete working code...</html>"
+    }`;
+    if (statusTextElement) {
+      statusTextElement.textContent = "Generating program...";
+    }
+    if (programCountElement) {
+      windowCount++;
+      programCountElement.textContent = `Programs: ${windowCount}`;
+    }
+    const loadingWindow = document.createElement('div');
+    loadingWindow.className = 'window';
+    loadingWindow.style.transform = `translate(${100 + windowCount * 30}px, ${100 + windowCount * 30}px)`;
+    loadingWindow.innerHTML = `
+          <div class="title-bar">
+              <div class="title">creating_program.exe</div>
+              <div class="buttons">
+                  <div class="button">_</div>
+                  <div class="button">□</div>
+                  <div class="button" onclick="this.closest('.window').remove()">×</div>
+              </div>
+          </div>
+          <div class="content">
+              <div class="loading-container">
+                  <div class="loading"></div>
+                  <p>Generating your program...</p>
+              </div>
+          </div>
+      `;
+    loadingWindow.querySelector('.title-bar').addEventListener('mousedown', dragStart);
+    document.body.appendChild(loadingWindow);
+    initResizeHandles(loadingWindow);
+    initWindowSnapping(loadingWindow);
+    try {
+      const response = await fetch('/api/ai_completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: aiPrompt,
+          data: {
+            prompt,
+            settings: aiSettings
+          }
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (statusTextElement) {
+        statusTextElement.textContent = "Program generated successfully!";
+      }
+      const programId = `program-${Date.now()}`;
+      const newWindow = document.createElement('div');
+      newWindow.className = 'window';
+      newWindow.style.transform = `translate(${100 + windowCount * 30}px, ${100 + windowCount * 30}px)`;
+      windowCount++;
+      newWindow.innerHTML = `
+              <div class="title-bar">
+                  <div class="title">${data.title || 'generated_program.exe'}</div>
+                  <div class="buttons">
+                      <div class="button" onclick="this.closest('.window').querySelector('.content').classList.toggle('hidden')">_</div>
+                      <div class="button">□</div>
+                      <div class="button" onclick="this.closest('.window').remove()">×</div>
+                  </div>
+              </div>
+              <div class="toolbar">
+                  <button class="toolbar-button" onclick="this.closest('.window').querySelector('.content').requestFullscreen()">Fullscreen</button>
+                  <button class="toolbar-button" onclick="location.reload()">Restart</button>
+                  <button class="toolbar-button" onclick="editWithAI(this.closest('.window'))">AI Edit</button>
+                  <button class="toolbar-button" onclick="shareProgram(this.closest('.window'))">Share</button>
+              </div>
+              <div class="content">
+                  <div id="${programId}" class="program-output">
+                      ${data.code}
+                  </div>
+              </div>
+              <div class="status-bar">
+                  <span>Ready</span>
+              </div>
+          `;
+      const toolbar = newWindow.querySelector('.toolbar');
+      const minimizeBtn = document.createElement('button');
+      minimizeBtn.className = 'toolbar-button';
+      minimizeBtn.textContent = 'Create Desktop Icon';
+      minimizeBtn.onclick = () => {
+        const programData = {
+          title: data.title,
+          html: newWindow.querySelector(`#${programId}`).innerHTML,
+          settings: getAISettings()
+        };
+        createDesktopIcon(data.title, 'program', programData);
+        newWindow.remove();
+      };
+      toolbar.appendChild(minimizeBtn);
+      newWindow.querySelector('.title-bar').addEventListener('mousedown', dragStart);
+      const container = newWindow.querySelector(`#${programId}`);
+      let resizeTimeout;
+      const observer = new ResizeObserver(entries => {
+        if (resizeTimeout) {
+          window.cancelAnimationFrame(resizeTimeout);
+        }
+        resizeTimeout = window.requestAnimationFrame(() => {
+          const entry = entries[0];
+          if (entry) {
+            const contentWidth = entry.contentRect.width;
+            const contentHeight = entry.contentRect.height;
+            const minWidth = 300;
+            const maxWidth = window.innerWidth * 0.9;
+            const maxHeight = window.innerHeight * 0.9;
+            const windowWidth = Math.max(minWidth, Math.min(contentWidth + 40, maxWidth));
+            newWindow.style.width = `${windowWidth}px`;
+            if (contentHeight + 80 > maxHeight) {
+              container.style.height = `calc(90vh - 80px)`;
+              container.style.overflowY = 'auto';
+            } else {
+              container.style.height = 'auto';
+              container.style.overflowY = 'visible';
+            }
+          }
+        });
+      });
+      observer.observe(container);
+      document.body.appendChild(newWindow);
+      initResizeHandles(newWindow);
+      initWindowSnapping(newWindow);
+      const scripts = container.getElementsByTagName('script');
+      Array.from(scripts).forEach(script => {
+        const newScript = document.createElement('script');
+        Array.from(script.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        newScript.textContent = script.textContent;
+        script.parentNode.replaceChild(newScript, script);
+      });
+      loadingWindow.remove();
+    } catch (error) {
+      console.error('Error generating program:', error);
+      loadingWindow.querySelector('.loading-container').innerHTML = `
+          <div class="loading"></div>
+          <p>Generating your program...</p>
+      `;
+      if (statusTextElement) {
+        statusTextElement.textContent = "Generating program...";
+      }
+    }
+  }
+  async function editWithAI(programWindow) {
+    const programOutput = programWindow.querySelector('.program-output');
+    const currentCode = programOutput.innerHTML;
+    const editPrompt = document.createElement('div');
+    editPrompt.className = 'ai-edit-prompt';
+    editPrompt.innerHTML = `
+          <textarea id="editInstructions" placeholder="Describe how you want to modify the program..."></textarea>
+          <button class="create-button" onclick="submitEdit(this)">Apply Changes</button>
+          <button class="create-button" onclick="this.parentElement.remove()">Cancel</button>
+      `;
+    programOutput.appendChild(editPrompt);
+  }
+  async function submitEdit(button) {
+    const programWindow = button.closest('.window');
+    const programOutput = programWindow.querySelector('.program-output');
+    const editPromptDialog = button.closest('.ai-edit-prompt');
+    const editInstructions = editPromptDialog.querySelector('#editInstructions').value;
+    if (!editInstructions) {
+      alert('Please enter edit instructions');
+      return;
+    }
+    editPromptDialog.remove();
+    const originalContent = programOutput.innerHTML;
+    programOutput.innerHTML = `
+              <div class="loading-container">
+                  <div class="loading"></div>
+                  <p>Modifying program...</p>
+              </div>
+          `;
+    try {
+      const response = await fetch('/api/ai_completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: `Please modify this program according to these instructions: ${editInstructions}
+                  
+                  Requirements:
+                  - Maintain or improve code quality and complexity
+                  - Keep all working functionality intact
+                  - Ensure output is valid HTML/JavaScript/CSS
+                  - Use modern coding practices and patterns
+                  - Add proper error handling and validation
+                  - Implement smooth transitions for any changes
+                  - Maintain responsive design
+                  - Consider performance implications
+                  - Add helpful code comments
+                  - Keep consistent code style
+                  - Make requested modifications while preserving program structure
+                  - Return complete, working modified code
+                  
+                  Current Program:
+                  ${originalContent}
+                  
+                  Modification Instructions:
+                  ${editInstructions}
+                  
+                  Response Format:
+                  {
+                      "title": "Modified Program Name",
+                      "code": "<div>...complete working HTML/JS/CSS code...</div>"
+                  }`,
+          data: {
+            currentCode: originalContent,
+            instructions: editInstructions,
+            settings: getAISettings()
+          }
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!data.code) {
+        throw new Error('Invalid response from AI service');
+      }
+      programOutput.innerHTML = data.code;
+      const scripts = programOutput.getElementsByTagName('script');
+      Array.from(scripts).forEach(script => {
+        const newScript = document.createElement('script');
+        Array.from(script.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        newScript.textContent = script.textContent;
+        script.parentNode.replaceChild(newScript, script);
+      });
+      const statusBar = programWindow.querySelector('.status-bar span');
+      if (statusBar) {
+        statusBar.textContent = 'Program updated successfully';
+      }
+    } catch (error) {
+      console.error('Error modifying program:', error);
+      programOutput.innerHTML = originalContent;
+      const scripts = programOutput.getElementsByTagName('script');
+      Array.from(scripts).forEach(script => {
+        const newScript = document.createElement('script');
+        Array.from(script.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        newScript.textContent = script.textContent;
+        script.parentNode.replaceChild(newScript, script);
+      });
+      const statusBar = programWindow.querySelector('.status-bar span');
+      if (statusBar) {
+        statusBar.textContent = 'Error modifying program';
+      }
+      alert(`Error modifying program: ${error.message}`);
+    }
+  }
+  function dragStart(e) {
+    const window = e.target.closest('.window');
+    if (!window || window.classList.contains('loading-window')) return;
+    const transform = window.style.transform || 'translate(0px, 0px)';
+    const matrix = new DOMMatrix(transform);
+    initialX = e.clientX - matrix.m41;
+    initialY = e.clientY - matrix.m42;
+    if (e.target.closest('.title-bar')) {
+      isDragging = true;
+      window.style.zIndex = Math.max(...Array.from(document.querySelectorAll('.window')).map(w => parseInt(w.style.zIndex || 0) || 0)) + 1;
+    }
+  }
+  function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const activeWindow = Array.from(document.querySelectorAll('.window')).find(w => parseInt(w.style.zIndex || 0) === Math.max(...Array.from(document.querySelectorAll('.window')).map(w => parseInt(w.style.zIndex || 0))));
+    if (!activeWindow) return;
+    currentX = e.clientX - initialX;
+    currentY = e.clientY - initialY;
+    const rect = activeWindow.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    currentX = Math.max(-rect.width + 100, Math.min(currentX, viewportWidth - 100));
+    currentY = Math.max(0, Math.min(currentY, viewportHeight - 50));
+    activeWindow.style.transform = `translate(${currentX}px, ${currentY}px)`;
+  }
+  function dragEnd(e) {
+    isDragging = false;
+  }
+  function hideContent() {
+    document.getElementById("content").classList.toggle('hidden');
+  }
+  function destroyProgram() {
+    document.getElementById("programWindow").remove();
+  }
+  let isResizing = false;
+  let currentHandle = null;
+  let originalWidth;
+  let originalHeight;
+  function initResizeHandles(window) {
+    window.querySelectorAll('.resize-handle').forEach(handle => handle.remove());
+    const handle = document.createElement('div');
+    handle.className = 'resize-handle bottom-right';
+    handle.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      isResizing = true;
+      currentHandle = 'bottom-right';
+      initialX = e.clientX;
+      initialY = e.clientY;
+      const rect = window.getBoundingClientRect();
+      originalWidth = rect.width;
+      originalHeight = rect.height;
+      document.body.style.userSelect = 'none';
+    });
+    window.appendChild(handle);
+  }
+  function handleResize(e) {
+    if (!isResizing || e.target.closest('.loading-window')) return;
+    e.preventDefault();
+    const window = e.target.closest('.window');
+    if (!window) return;
+    const deltaX = e.clientX - initialX;
+    const deltaY = e.clientY - initialY;
+    const minWidth = 300;
+    const minHeight = 200;
+    const newWidth = Math.max(minWidth, originalWidth + deltaX);
+    const newHeight = Math.max(minHeight, originalHeight + deltaY);
+    window.style.width = `${newWidth}px`;
+    window.style.height = `${newHeight}px`;
+    const content = window.querySelector('.content');
+    if (content) {
+      content.style.height = `${newHeight - 80}px`;
+    }
+  }
+  document.addEventListener('mouseup', () => {
+    isResizing = false;
+    document.body.style.userSelect = '';
+  });
+  function initWindowSnapping(window) {
+    const snapThreshold = 20;
+    let snapGuides = [];
+    window.addEventListener('drag', e => {
+      const rect = window.getBoundingClientRect();
+      const windows = Array.from(document.querySelectorAll('.window')).filter(w => w !== window);
+      snapGuides.forEach(g => g.remove());
+      snapGuides = [];
+      windows.forEach(other => {
+        const otherRect = other.getBoundingClientRect();
+        if (Math.abs(rect.left - otherRect.right) < snapThreshold) {
+          window.style.left = `${otherRect.right}px`;
+          const guide = document.createElement('div');
+          guide.className = 'snap-guide';
+          guide.style.left = `${rect.left}px`;
+          guide.style.top = `${rect.top}px`;
+          guide.style.height = `${rect.height}px`;
+          snapGuides.push(guide);
+          document.body.appendChild(guide);
+        }
+      });
+    });
+    window.addEventListener('dragend', () => {
+      snapGuides.forEach(g => g.remove());
+      snapGuides = [];
+    });
+  }
+  function addProgramSearch(window) {
+    const searchBar = document.createElement('div');
+    searchBar.className = 'search-bar';
+    searchBar.innerHTML = `
+          <input type="text" placeholder="Search programs...">
+          <button class="toolbar-button">Search</button>
+      `;
+    const content = window.querySelector('.content');
+    content.insertBefore(searchBar, content.firstChild);
+    searchBar.querySelector('input').addEventListener('input', e => {
+      const query = e.target.value.toLowerCase();
+      const programs = window.querySelectorAll('.program-item');
+      programs.forEach(program => {
+        const title = program.querySelector('.program-title').textContent.toLowerCase();
+        const prompt = program.querySelector('.program-prompt').textContent.toLowerCase();
+        program.style.display = title.includes(query) || prompt.includes(query) ? '' : 'none';
+      });
+    });
+  }
+  function initWindowFocus() {
+    let maxZIndex = 1000;
+    document.addEventListener('mousedown', e => {
+      const window = e.target.closest('.window');
+      if (window) {
+        window.style.zIndex = ++maxZIndex;
+      }
+    });
+  }
+  function initKeyboardShortcuts() {
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey) {
+        switch (e.key) {
+          case 'n':
+            e.preventDefault();
+            clearPrompt();
+            break;
+          case 's':
+            e.preventDefault();
+            savePrompt();
+            break;
+          case 'l':
+            e.preventDefault();
+            loadPrompt();
+            break;
+          case 'h':
+            e.preventDefault();
+            toggleHelp();
+            break;
+        }
+      }
+    });
+  }
+  function createDesktopIcon(name, type, data = null) {
+    const icon = document.createElement('div');
+    icon.className = 'desktop-icon';
+    icon.draggable = true;
+    icon.id = `icon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    icon.innerHTML = `
+      <div class="icon-image ${type}">
+        ${type === 'folder' ? '📁' : '📄'}
+      </div>
+      <div class="icon-label">${name}</div>
+    `;
+    const col = iconCounter % 6;
+    const row = Math.floor(iconCounter / 6);
+    icon.style.left = `${20 + col * 100}px`;
+    icon.style.top = `${20 + row * 100}px`;
+    const handleClick = e => {
+      e.preventDefault();
+      if (type === 'folder-create') {
+        createNewFolder();
+      } else if (type === 'folder') {
+        openFolder(data);
+      } else if (data) {
+        openSavedProgram(data);
+      }
+    };
+    icon.onclick = handleClick;
+    iconCounter++;
+    document.body.appendChild(icon);
+    desktopIcons.push(icon);
+    return icon;
+  }
+  function createNewFolder() {
+    const folder = {
+      id: `folder-${Date.now()}`,
+      name: `Folder ${folders.length + 1}`,
+      items: []
+    };
+    const folderIcon = createDesktopIcon(folder.name, 'folder', folder);
+    folders.push(folder);
+    return folderIcon;
+  }
+  function openFolder(folder) {
+    const folderWindow = document.createElement('div');
+    folderWindow.className = 'window';
+    folderWindow.style.transform = `translate(${150 + windowCount * 30}px, ${150 + windowCount * 30}px)`;
+    folderWindow.innerHTML = `
+      <div class="title-bar">
+        <div class="title">${folder.name}</div>
+        <div class="buttons">
+          <div class="button" onclick="this.closest('.window').remove()">×</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="folder-contents">
+          ${folder.items.map(item => `
+            <div class="folder-item" onclick="openSavedProgram(${JSON.stringify(item)})">
+              ${item.title}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    folderWindow.querySelector('.title-bar').addEventListener('mousedown', dragStart);
+    document.body.appendChild(folderWindow);
+    initResizeHandles(folderWindow);
+    initWindowSnapping(folderWindow);
+  }
+  function openSavedProgram(programData) {
+    if (!programData) {
+      console.error('No program data provided');
+      return;
+    }
+    const newWindow = document.createElement('div');
+    newWindow.className = 'window';
+    newWindow.style.transform = `translate(${100 + windowCount * 30}px, ${100 + windowCount * 30}px)`;
+    windowCount++;
+    newWindow.innerHTML = `
+      <div class="title-bar">
+        <div class="title">${programData.title || 'Untitled Program'}</div>
+        <div class="buttons">
+          <div class="button" onclick="this.closest('.window').querySelector('.content').classList.toggle('hidden')">_</div>
+          <div class="button">□</div>
+          <div class="button" onclick="this.closest('.window').remove()">×</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="program-container"></div>
+      </div>
+      <div class="status-bar">
+        <span>Ready</span>
+      </div>
+    `;
+    const titleBar = newWindow.querySelector('.title-bar');
+    titleBar.addEventListener('mousedown', dragStart);
+    document.body.appendChild(newWindow);
+    const container = newWindow.querySelector('.program-container');
+    container.innerHTML = programData.html || '<div class="error">No program content available</div>';
+    const scriptElements = container.getElementsByTagName('script');
+    for (const scriptEl of scriptElements) {
+      const newScript = document.createElement('script');
+      for (const attr of scriptEl.attributes) {
+        newScript.setAttribute(attr.name, attr.value);
+      }
+      newScript.textContent = `
+        (function() {
+          ${scriptEl.textContent}
+        })();
+      `;
+      scriptEl.parentNode.replaceChild(newScript, scriptEl);
+    }
+    initResizeHandles(newWindow);
+    initWindowSnapping(newWindow);
+  }
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+  const titleBar = document.getElementById('titleBar');
+  titleBar.addEventListener('mousedown', dragStart);
+  initWindowFocus();
+  initKeyboardShortcuts();
+  const newFolderBtn = createDesktopIcon('New Folder', 'folder-create');
+  document.addEventListener('mousemove', handleResize);
+  
+  // Add a new folder named "CA" with content "sigma"
+  const caFolder = {
+    id: 'folder-ca',
+    name: 'CA',
+    items: [{ title: 'TBA', html: '' }]
+  };
+  createDesktopIcon('CA', 'folder', caFolder);
+  
+  </script>
+  
+  </body></html>
